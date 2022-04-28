@@ -21,27 +21,33 @@ class PlacesListView extends GetView<PlacesListController> {
           )
         ],
       ),
-      body: Obx(
-        () => Center(
-          child: controller.places.isEmpty
-              ? Text('You list is empty- try add some places')
-              : ListView.builder(
-                itemCount: controller.places.length,
-                  itemBuilder: (context, i) {
-                    return Row(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 100,
-                          child: Image.file(controller.places[i].image),
+      body: FutureBuilder(
+        future: controller.fetchPlaces(),
+        builder: ((context, snapshot) => snapshot.connectionState ==
+                ConnectionState.waiting
+            ? Center(child: CircularProgressIndicator())
+            : Obx(
+                () => Center(
+                  child: controller.places.isEmpty
+                      ? Text('You list is empty- try add some places')
+                      : ListView.builder(
+                          itemCount: controller.places.length,
+                          itemBuilder: (context, i) {
+                            return Row(
+                              children: [
+                                Container(
+                                  height: 150,
+                                  width: 100,
+                                  child: Image.file(controller.places[i].image),
+                                ),
+                                SizedBox(width: 30),
+                                Text(controller.places[i].title)
+                              ],
+                            );
+                          },
                         ),
-                        SizedBox(width: 30),
-                        Text(controller.places[i].title)
-                      ],
-                    );
-                  },
                 ),
-        ),
+              )),
       ),
     );
   }

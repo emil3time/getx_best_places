@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as syspaths;
 
 import '../../../models/place.dart';
+import '../../../helpers/db_helper.dart';
 
 class PlacesListController extends GetxController {
   final RxList<Place> _places = <Place>[].obs;
@@ -58,6 +59,11 @@ class PlacesListController extends GetxController {
       title: title,
     );
     _places.add(newPlace);
+    DBHelper.insertData('user_places', {
+      'id': newPlace.id,
+      'title': newPlace.title,
+      'image': newPlace.image.path
+    });
   }
 
   void savePlace() {
@@ -68,5 +74,20 @@ class PlacesListController extends GetxController {
     addPlace(titleController.text, savedImage!);
     Get.back();
     print(places);
+  }
+
+  Future<void> fetchPlaces() async {
+   
+    final queryData = await DBHelper.queryData('user_places');
+    _places.value = queryData
+        .map((e) =>
+            Place(id: e['id'], image: File(e['image']), title: e['title']))
+        .toList();
+  }
+
+  @override
+  void onInit() async {
+
+    super.onInit();
   }
 }
