@@ -2,12 +2,14 @@ import 'package:get/get.dart';
 import 'package:getx_best_places/app/models/place.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:getx_best_places/app/services/location_services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as syspaths;
+import 'package:location/location.dart';
 
 import '../../../models/place.dart';
-import '../../../helpers/db_helper.dart';
+import '../../../services/db_services.dart';
 
 class PlacesListController extends GetxController {
   final RxList<Place> _places = <Place>[].obs;
@@ -20,6 +22,10 @@ class PlacesListController extends GetxController {
 
   File? takeImage;
   File? savedImage;
+
+  String? previewImage;
+
+  PlaceLocation userLocation = PlaceLocation(latitude: 1.0, longitude: 1.0);
 
   Future<void> takePicture() async {
     final picker = ImagePicker();
@@ -59,7 +65,7 @@ class PlacesListController extends GetxController {
       title: title,
     );
     _places.add(newPlace);
-    DBHelper.insertData('user_places', {
+    DBServices.insertData('user_places', {
       'id': newPlace.id,
       'title': newPlace.title,
       'image': newPlace.image.path
@@ -77,17 +83,29 @@ class PlacesListController extends GetxController {
   }
 
   Future<void> fetchPlaces() async {
-   
-    final queryData = await DBHelper.queryData('user_places');
+    final queryData = await DBServices.queryData('user_places');
     _places.value = queryData
         .map((e) =>
             Place(id: e['id'], image: File(e['image']), title: e['title']))
         .toList();
   }
 
-  @override
-  void onInit() async {
+  Future<void> getCurrentUserLocatioonOnMap() async {
+    final locationData = await Location().getLocation();
+    // print(locationData.latitude);
+    // print(locationData.longitude);
 
-    super.onInit();
+    String staticMapImageApiUrl = LocationServices.generateLocationPreviewImage(
+        latitude: locationData.latitude!, longitude: locationData.longitude!);
+
+    previewImage = staticMapImageApiUrl;
+    update();
+  }
+
+  Future<void> updateUserLocationCoordinates() async {
+    final locationData = await Location().getLocation();
+    userLocation = PlaceLocation(
+        latitude: locationData.latitude!, longitude: locationData.longitude!);
+    update();
   }
 }

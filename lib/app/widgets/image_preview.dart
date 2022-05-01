@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_best_places/app/modules/add_place/controllers/add_place_controller.dart';
 import 'package:getx_best_places/app/modules/places_list/controllers/places_list_controller.dart';
 
 class ImagePreview extends GetView<PlacesListController> {

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_best_places/app/modules/places_list/controllers/places_list_controller.dart';
 
-
 import 'package:getx_best_places/app/widgets/image_preview.dart';
+import 'package:getx_best_places/app/widgets/location_preview.dart';
 
 class AddPlaceView extends GetView<PlacesListController> {
   @override
@@ -29,7 +29,9 @@ class AddPlaceView extends GetView<PlacesListController> {
                         decoration: InputDecoration(hintText: 'Title'),
                       ),
                       SizedBox(height: 20),
-                      ImagePreview()
+                      ImagePreview(),
+                      SizedBox(height: 10),
+                      LocationPreview(),
                     ],
                   ),
                 ),
@@ -38,7 +40,6 @@ class AddPlaceView extends GetView<PlacesListController> {
             MaterialButton(
               onPressed: () {
                 controller.savePlace();
-               
               },
               elevation: 0,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

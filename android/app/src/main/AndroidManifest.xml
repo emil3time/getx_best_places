@@ -4,6 +4,8 @@
         android:label="getx_best_places"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+         <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyBCotzmNkQ58AVlS5oPMLh3gMPkxgPHBe0"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
