@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:getx_best_places/app/models/place.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:getx_best_places/app/services/location_services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as syspaths;
@@ -25,7 +28,9 @@ class PlacesListController extends GetxController {
 
   String? previewImage;
 
-  PlaceLocation userLocation = PlaceLocation(latitude: 1.0, longitude: 1.0);
+  PlaceLocation? userLocation;
+  LatLng? selectedPosition;
+  bool isSelecting = false;
 
   Future<void> takePicture() async {
     final picker = ImagePicker();
@@ -58,11 +63,18 @@ class PlacesListController extends GetxController {
         ]);
   }
 
-  void addPlace(String title, File image) {
+  void addPlace({required String title, required File image, required PlaceLocation userLocation}) async {
+    var response = await LocationServices.getAddress(
+        lat: userLocation.latitude, long: userLocation.longitude);
+
+    Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+    final address = decodedResponse['results'][0]['formatted_address'];
+
     final newPlace = Place(
       id: DateTime.now().toString(),
       image: image,
       title: title,
+      
     );
     _places.add(newPlace);
     DBServices.insertData('user_places', {
@@ -73,11 +85,17 @@ class PlacesListController extends GetxController {
   }
 
   void savePlace() {
-    if (titleController.text.isEmpty || savedImage == null) {
+    if (titleController.text.isEmpty ||
+        savedImage == null ||
+        userLocation == null) {
       showErrorDialog();
       return;
     }
-    addPlace(titleController.text, savedImage!);
+    addPlace( title:
+      titleController.text,
+      image:  savedImage!,
+      userLocation: userLocation!
+    );
     Get.back();
     print(places);
   }
@@ -90,10 +108,8 @@ class PlacesListController extends GetxController {
         .toList();
   }
 
-  Future<void> getCurrentUserLocatioonOnMap() async {
+  Future<void> getCurrentUserLocationOnMap() async {
     final locationData = await Location().getLocation();
-    // print(locationData.latitude);
-    // print(locationData.longitude);
 
     String staticMapImageApiUrl = LocationServices.generateLocationPreviewImage(
         latitude: locationData.latitude!, longitude: locationData.longitude!);
@@ -102,10 +118,35 @@ class PlacesListController extends GetxController {
     update();
   }
 
-  Future<void> updateUserLocationCoordinates() async {
+  Future<void> selectOnMapStartingPoint() async {
+    if (selectedPosition != null) {
+      userLocation = PlaceLocation(
+          latitude: selectedPosition!.latitude,
+          longitude: selectedPosition!.longitude);
+      return;
+    }
     final locationData = await Location().getLocation();
     userLocation = PlaceLocation(
         latitude: locationData.latitude!, longitude: locationData.longitude!);
+  }
+
+  void selectLocation(LatLng position) {
+    selectedPosition = position;
+    isSelecting = true;
     update();
+  }
+
+  void getSelectedUserLocationOnMap() async {
+    String staticMapImageApiUrl = LocationServices.generateLocationPreviewImage(
+        latitude: selectedPosition!.latitude,
+        longitude: selectedPosition!.longitude);
+
+    previewImage = staticMapImageApiUrl;
+
+    // await LocationServices.getAddress(
+    //     lat: selectedPosition!.latitude, long: selectedPosition!.longitude);
+
+    update();
+    Get.back();
   }
 }

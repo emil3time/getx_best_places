@@ -11,12 +11,35 @@ class MapScreen extends GetView<PlacesListController> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Map'),
+        actions: [
+          GetBuilder<PlacesListController>(builder: (value) {
+            return value.isSelecting
+                ? IconButton(
+                    onPressed: () {
+                      controller.getSelectedUserLocationOnMap();
+                    },
+                    icon: Icon(Icons.check))
+                : SizedBox();
+          })
+        ],
       ),
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-            target: LatLng(controller.userLocation.latitude,
-                controller.userLocation.longitude),
-            zoom: 16),
+      body: GetBuilder<PlacesListController>(
+        builder: (value) {
+          return GoogleMap(
+            initialCameraPosition: CameraPosition(
+                target: LatLng(controller.userLocation!.latitude,
+                    controller.userLocation!.longitude),
+                zoom: 16),
+            onTap: value.selectLocation,
+            markers: value.selectedPosition == null
+                ? {}
+                : {
+                    Marker(
+                        markerId: MarkerId('m1'),
+                        position: value.selectedPosition!)
+                  },
+          );
+        },
       ),
     );
   }

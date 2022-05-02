@@ -31,15 +31,20 @@ class LocationPreview extends GetView<PlacesListController> {
           children: [
             TextButton.icon(
                 onPressed: () {
-                  controller.getCurrentUserLocatioonOnMap();
+                  controller.getCurrentUserLocationOnMap();
                 },
                 icon: Icon(Icons.location_on),
                 label: Text('Current Location')),
             TextButton.icon(
                 onPressed: () async {
+
                   await controller
-                      .updateUserLocationCoordinates()
+                      .selectOnMapStartingPoint()
                       .then((_) => Get.to(MapScreen(), fullscreenDialog: true));
+                  if (controller.selectedPosition == null) {
+                    return;
+                  }
+                  print(controller.selectedPosition!.latitude);
                 },
                 icon: Icon(Icons.map),
                 label: Text('Select on Map')),
