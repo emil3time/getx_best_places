@@ -30,14 +30,16 @@ class MapScreen extends GetView<PlacesListController> {
                 target: LatLng(controller.userLocation!.latitude,
                     controller.userLocation!.longitude),
                 zoom: 16),
-            onTap: value.selectLocation,
-            markers: value.selectedPosition == null
-                ? {}
-                : {
-                    Marker(
-                        markerId: MarkerId('m1'),
-                        position: value.selectedPosition!)
-                  },
+            onTap: value.savedPosition == null ? value.selectLocation : null,
+            markers:
+                value.selectedPosition == null && value.savedPosition == null
+                    ? {}
+                    : {
+                        Marker(
+                            markerId: MarkerId('m1'),
+                            position:
+                                value.selectedPosition ?? value.savedPosition!)
+                      },
           );
         },
       ),

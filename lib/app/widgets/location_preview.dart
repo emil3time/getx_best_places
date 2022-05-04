@@ -40,11 +40,11 @@ class LocationPreview extends GetView<PlacesListController> {
 
                   await controller
                       .selectOnMapStartingPoint()
-                      .then((_) => Get.to(MapScreen(), fullscreenDialog: true));
+                      .then((_) => Get.off(MapScreen(), fullscreenDialog: true));
                   if (controller.selectedPosition == null) {
                     return;
                   }
-                  print(controller.selectedPosition!.latitude);
+
                 },
                 icon: Icon(Icons.map),
                 label: Text('Select on Map')),

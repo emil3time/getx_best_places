@@ -17,6 +17,6 @@ class Place {
   Place(
       {required this.id,
       required this.image,
-      this.location,
+      required this.location,
       required this.title});
 }
